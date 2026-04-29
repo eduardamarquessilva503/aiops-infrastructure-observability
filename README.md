@@ -31,7 +31,22 @@ Este projeto foi desenvolvido com foco em **SRE (Site Reliability Engineering)**
 - **Monitoramento**: Psutil
 - **Infraestrutura**: Docker & Docker Compose
 
----
+## 📂 Estrutura do Projeto
+
+```text
+├── api_ia_profissional/
+│   ├── ai_model/         # Módulo de integração com IA
+│   ├── auth/             # Regras de segurança e JWT
+│   ├── database/         # Configurações do banco SQLite
+│   ├── models/           # Schemas de validação de dados
+│   ├── main.py           # Ponto de entrada da API
+│   ├── Dockerfile        # Receita de construção do container
+│   └── requirements.txt  # Dependências do sistema
+├── docker-compose.yml    # Orquestração do ambiente
+├── agente_monitor.py     # Script de coleta (roda no host)
+└── .gitignore            # Proteção de arquivos sensíveis
+
+
 
 ## ⚙️ Como Executar
 
@@ -73,10 +88,4 @@ docker-compose up --build
 
 ---
 
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
-<p align="center"> Desenvolvido com ❤️ para a comunidade de AIOps & SRE </p>
+<p align="center"> Desenvolvido por Maria Eduarda Marques </p>
