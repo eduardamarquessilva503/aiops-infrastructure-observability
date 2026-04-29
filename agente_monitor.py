@@ -1,14 +1,16 @@
 import psutil
 import requests
 import time
+import os
 from datetime import datetime
+from dotenv import load_dotenv
 
-# URL da nossa API de IA que criamos
-URL_API = "http://127.0.0.1:8000/analisar_texto"
+# Carrega as variáveis do arquivo .env
+load_dotenv()
 
-# Token de mentirinha só para passar pela segurança da API por enquanto
-# (No mundo real, esse script faria o login primeiro)
-TOKEN_TEMPORARIO = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc3NzQyMDE5M30.RmFHN7ANZV3KNUKwWy8KOOLp8gYLJyFfQW8XYeWJXSg"
+# URL da nossa API de IA
+URL_API = os.getenv("URL_API", "http://127.0.0.1:8000/analisar_texto")
+TOKEN_TEMPORARIO = os.getenv("TOKEN_TEMPORARIO")
 
 def coletar_metricas_e_enviar():
     print("🤖 Iniciando Agente de Monitoramento SRE...")

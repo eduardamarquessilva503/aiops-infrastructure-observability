@@ -1,6 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+import os
+from dotenv import load_dotenv
+
+# Carrega as variáveis do arquivo .env
+load_dotenv()
 
 # Bibliotecas para o envio de e-mail
 import smtplib
@@ -16,10 +21,10 @@ app = FastAPI(title="API com IA e Autenticação")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # ==========================================
-# CONFIGURAÇÕES DE ALERTA (VOZ)
+# CONFIGURAÇÕES DE ALERTA (EMAIL)
 # ==========================================
-MEU_EMAIL = "eduardamarquessilva503@gmail.com"
-SENHA_DE_APP = "qjzuetduzczujafx"   
+MEU_EMAIL = os.getenv("MEU_EMAIL")
+SENHA_DE_APP = os.getenv("SENHA_DE_APP")
 
 def disparar_email(diagnostico, log_sistema):
     msg = MIMEMultipart()

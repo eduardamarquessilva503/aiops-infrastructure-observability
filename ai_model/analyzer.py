@@ -1,6 +1,14 @@
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
-CHAVE_API ="AIzaSyDpn_PRcBHmPg7ooCvJ8Qbo5mCANATeLgo"
+# Carrega as variáveis do arquivo .env
+load_dotenv()
+
+CHAVE_API = os.getenv("GEMINI_API_KEY")
+
+if not CHAVE_API:
+    raise ValueError("A variável de ambiente GEMINI_API_KEY não foi encontrada no arquivo .env")
 
 genai.configure(api_key=CHAVE_API)
 
