@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  api-aiops:
+    build: .
+    container_name: cerebro_aiops
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./banco_dados.db:/app/banco_dados.db
+    restart: unless-stopped

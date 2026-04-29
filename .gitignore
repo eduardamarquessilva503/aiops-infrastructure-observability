@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+banco_dados.db
+database/*.db
+.vscode/
+.idea/
+*.log
+docker-compose.override.yml
