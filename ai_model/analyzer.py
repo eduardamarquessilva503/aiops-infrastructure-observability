@@ -5,10 +5,11 @@ from dotenv import load_dotenv
 # Carrega as variáveis do arquivo .env
 load_dotenv()
 
+# A chave real fica no arquivo .env (GEMINI_API_KEY=SUA_CHAVE_AQUI)
 CHAVE_API = os.getenv("GEMINI_API_KEY")
 
-if not CHAVE_API:
-    raise ValueError("A variável de ambiente GEMINI_API_KEY não foi encontrada no arquivo .env")
+if not CHAVE_API or CHAVE_API == "COLOQUE_SUA_CHAVE_AQUI":
+    raise ValueError("Erro: GEMINI_API_KEY não configurada. Adicione sua chave no arquivo .env")
 
 genai.configure(api_key=CHAVE_API)
 
