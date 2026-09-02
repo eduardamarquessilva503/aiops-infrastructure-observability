@@ -30,7 +30,7 @@ jobs:
 
       # Passo 3: Rodar o Linter (Flake8) para verificar a qualidade do código
       - name: Verificar padronização de código (Lint)
-        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        run: flake8 . --exclude=venv,.venv,__pycache__ --count --select=E9,F63,F7,F82 --show-source --statistics
 
       # Passo 4: Rodar os testes unitários da API
       - name: Rodar Testes com Pytest
