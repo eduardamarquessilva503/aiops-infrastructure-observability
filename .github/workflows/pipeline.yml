@@ -45,7 +45,7 @@ jobs:
       # Passo 5: Copiar o arquivo .env existente da sua máquina original
       - name: Copiar .env original
         run: |
-          Copy-Item "c:\xampp\htdocs\AIOps (Inteligência Artificial para Operações de TI)\api_ia_profissional\.env" -Destination .\.env
+          Copy-Item "c:\xampp\htdocs\AIOps*\api_ia_profissional\.env" -Destination .\.env
 
       # Passo 6: Reiniciar os containers Docker com as alterações mais recentes
       # Como é self-hosted, ele vai rodar os comandos do Docker diretamente na sua máquina
