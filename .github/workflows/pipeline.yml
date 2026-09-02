@@ -42,7 +42,15 @@ jobs:
           GEMINI_API_KEY: "CHAVE_FALSA_PARA_TESTES_PASSAREM"
         run: pytest tests/
 
-      # Passo 5: Reiniciar os containers Docker com as alterações mais recentes
+      # Passo 5: Criar arquivo .env para o Docker rodar
+      - name: Configurar Variáveis de Ambiente (.env)
+        shell: bash
+        run: |
+          echo "GEMINI_API_KEY=CHAVE_FALSA_PARA_TESTES_PASSAREM" > .env
+          echo "MEU_EMAIL=teste@teste.com" >> .env
+          echo "SENHA_DE_APP=senha_teste" >> .env
+
+      # Passo 6: Reiniciar os containers Docker com as alterações mais recentes
       # Como é self-hosted, ele vai rodar os comandos do Docker diretamente na sua máquina
       - name: Deploy com Docker Compose
         run: |
