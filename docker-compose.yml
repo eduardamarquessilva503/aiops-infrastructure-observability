@@ -11,6 +11,17 @@ services:
       - db
     restart: unless-stopped
 
+  agent-aiops:
+    build: .
+    container_name: agent_aiops
+    command: python agente_monitor.py
+    environment:
+      - URL_API=http://api-aiops:8000/telemetria
+      - TOKEN_TEMPORARIO=${TOKEN_TEMPORARIO}
+    depends_on:
+      - api-aiops
+    restart: unless-stopped
+
   db:
     image: postgres:15
     container_name: db_aiops
