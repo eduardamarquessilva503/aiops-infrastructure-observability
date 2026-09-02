@@ -36,6 +36,7 @@ jobs:
       - name: Rodar Testes com Pytest
         env:
           URL_API: http://127.0.0.1:8001/telemetria
+          DATABASE_URL: sqlite:///./test.db
           MEU_EMAIL: ${{ secrets.MEU_EMAIL }}
           SENHA_DE_APP: ${{ secrets.SENHA_DE_APP }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
