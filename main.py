@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import os
@@ -12,10 +12,10 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from database.config import get_db, UsuarioDB, HistoricoAnaliseDB
+from database.config import get_db, UsuarioDB, HistoricoAnaliseDB, MetricaInfra
 from auth.security import criptografar_senha, verificar_senha, criar_token_jwt
 from ai_model.analyzer import analisar_sentimento
-from models.schemas import UsuarioCreate, Token, TextoRequisicao
+from models.schemas import UsuarioCreate, Token, TextoRequisicao, MetricaRequisicao
 
 app = FastAPI(title="API com IA e Autenticação")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -73,7 +73,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     return {"access_token": token, "token_type": "bearer"}
 
 @app.post("/analisar_texto", tags=["Inteligência Artificial"])
-def usar_ia(requisicao: TextoRequisicao, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def usar_ia(requisicao: TextoRequisicao, background_tasks: BackgroundTasks, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     # 1. A IA analisa o texto
     resultado = analisar_sentimento(requisicao.texto)
     
@@ -85,21 +85,47 @@ def usar_ia(requisicao: TextoRequisicao, token: str = Depends(oauth2_scheme), db
     db.add(novo_historico)
     db.commit()
 
-    # 3. Dispara o e-mail se a IA detectar problemas
+    # 3. Dispara o e-mail se a IA detectar problemas (EM SEGUNDO PLANO)
     if "[ALERTA]" in resultado or "[CRÍTICO]" in resultado:
-        disparar_email(resultado, requisicao.texto)
+        background_tasks.add_task(disparar_email, resultado, requisicao.texto)
     
     return {
         "texto_enviado": requisicao.texto,
         "diagnostico_ia": resultado,
         "status": "Salvo no Banco e Alerta Processado"
     }
+
+@app.post("/telemetria", tags=["Inteligência Artificial"])
+def receber_telemetria(requisicao: MetricaRequisicao, background_tasks: BackgroundTasks, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    # 1. Monta o texto para a IA analisar (similar ao que o agente fazia)
+    texto_log = f"Relatório: O uso da CPU está em {requisicao.cpu_percent}% e a Memória RAM em {requisicao.ram_percent}% na máquina {requisicao.machine_id}."
+    resultado_ia = analisar_sentimento(texto_log)
+    
+    # 2. Salva a métrica estruturada no banco de dados (novo modelo)
+    nova_metrica = MetricaInfra(
+        machine_id=requisicao.machine_id,
+        cpu_percent=requisicao.cpu_percent,
+        ram_percent=requisicao.ram_percent,
+        log_alerta=resultado_ia if "[ALERTA]" in resultado_ia or "[CRÍTICO]" in resultado_ia else None
+    )
+    db.add(nova_metrica)
+    db.commit()
+
+    # 3. Dispara e-mail se necessário (EM SEGUNDO PLANO)
+    if "[ALERTA]" in resultado_ia or "[CRÍTICO]" in resultado_ia:
+        background_tasks.add_task(disparar_email, resultado_ia, texto_log)
+    
+    return {
+        "status": "Métrica recebida com sucesso",
+        "machine_id": requisicao.machine_id,
+        "diagnostico_ia": resultado_ia
+    }
 @app.post("/testar_email", tags=["Testes SRE"])
-def testar_email_direto():
+def testar_email_direto(background_tasks: BackgroundTasks):
     print("Iniciando teste forçado de e-mail...")
     try:
-        # Chama a função de e-mail ignorando a IA
-        disparar_email("[CRÍTICO] Teste Manual de Sistema", "Log de teste: Validando se o carteiro está acordado.")
-        return {"msg": "Comando de envio acionado! Olhe o terminal do Uvicorn."}
+        # Chama a função de e-mail ignorando a IA (EM SEGUNDO PLANO)
+        background_tasks.add_task(disparar_email, "[CRÍTICO] Teste Manual de Sistema", "Log de teste: Validando se o carteiro está acordado.")
+        return {"msg": "Comando de envio acionado em segundo plano! Olhe o terminal do Uvicorn."}
     except Exception as e:
         return {"erro_critico": str(e)}

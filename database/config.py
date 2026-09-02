@@ -1,15 +1,16 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Numeric, Text
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.sql import func
 from datetime import datetime
 
 # Carrega as variáveis do arquivo .env
 load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./banco_dados.db")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://sre_user:sre_pass@db:5432/aiops")
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -27,6 +28,15 @@ class HistoricoAnaliseDB(Base):
     texto_analisado = Column(String)
     diagnostico = Column(String)
     data_hora = Column(DateTime, default=datetime.utcnow)
+
+class MetricaInfra(Base):
+    __tablename__ = "metricas_infra"
+    id = Column(Integer, primary_key=True, index=True)
+    machine_id = Column(String(100), index=True, nullable=False)
+    cpu_percent = Column(Numeric(5, 2), nullable=False)
+    ram_percent = Column(Numeric(5, 2), nullable=False)
+    log_alerta = Column(Text, nullable=True)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now(), index=True)
 
 Base.metadata.create_all(bind=engine)
 

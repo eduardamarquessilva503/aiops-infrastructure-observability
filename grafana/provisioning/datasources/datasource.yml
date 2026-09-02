@@ -1,0 +1,18 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL
+    uid: PostgreSQL
+    type: postgres
+    access: proxy
+    url: db:5432
+    user: sre_user
+    database: aiops
+    secureJsonData:
+      password: sre_pass
+    jsonData:
+      database: aiops
+      sslmode: 'disable'
+      postgresVersion: 15
+    isDefault: true
+    editable: true

@@ -16,3 +16,8 @@ class HistoricoAnalise(BaseModel):
     texto_analisado: str
     diagnostico: str
     data_hora: str
+
+class MetricaRequisicao(BaseModel):
+    machine_id: str
+    cpu_percent: float
+    ram_percent: float
